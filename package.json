@@ -1,0 +1,9 @@
+{
+  "name": "ts-diagrams",
+  "version": "0.0.0",
+  "description": "Experiments with a diagraming technology native to TypeScript",
+  "main": "./dist/index.js",
+  "author": "Kieran Mann <kieranjarrettmann@gmail.com>",
+  "license": "MIT",
+  "packageManager": "yarn@3.2.3"
+}
