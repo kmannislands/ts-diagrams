@@ -1,3 +1,5 @@
+import { describe, expect, it } from "@jest/globals";
+import { renderDiagramToPlantUML } from "./frontend-plantuml";
 import { SequenceDiagram } from "./sequence-diagram";
 
 describe("Sequence Diagram integration with PlantUML frontend", () => {

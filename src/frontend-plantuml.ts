@@ -4,7 +4,7 @@ import { assertUnreachable, BrandedStr } from "./type-util";
 
 type PlantUMLSource = BrandedStr<"PlantUMLSource">;
 
-function sequenceDiagramToPuml(
+export function sequenceDiagramToPuml(
   diagram: SequenceDiagram,
   title?: string
 ): PlantUMLSource {
@@ -13,7 +13,7 @@ function sequenceDiagramToPuml(
   // open/close @startUml
 }
 
-function renderDiagramToPlantUML(
+export function renderDiagramToPlantUML(
   diagram: Diagram,
   title?: string
 ): PlantUMLSource {
