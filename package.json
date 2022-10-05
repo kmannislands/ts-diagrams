@@ -5,5 +5,11 @@
   "main": "./dist/index.js",
   "author": "Kieran Mann <kieranjarrettmann@gmail.com>",
   "license": "MIT",
-  "packageManager": "yarn@3.2.3"
+  "packageManager": "yarn@3.2.3",
+  "scripts": {
+    "typecheck": "tsc -b ."
+  },
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  }
 }
