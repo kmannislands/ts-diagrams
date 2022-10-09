@@ -17,6 +17,6 @@ describe("Sequence Diagram integration with PlantUML frontend", () => {
 
     const renderedSource = renderDiagramToPlantUML(classicExample);
 
-    expect(renderedSource).toMatchInlineSnapshot();
+    expect(renderedSource).toMatchInlineSnapshot(`undefined`);
   });
 });
