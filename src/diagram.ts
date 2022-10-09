@@ -1,7 +1,7 @@
 import { SequenceDiagram } from "./sequence-diagram";
 
 // Add to union with new types:
-export type Diagram = SequenceDiagram;
+export type Diagram = SequenceDiagram<string>;
 
 export enum DiagramEntityType {
   Participant = "participant",
@@ -9,9 +9,7 @@ export enum DiagramEntityType {
 }
 
 export interface DiagramEntity {
-  type: DiagramEntityType;
-  name: string;
-  meta?: any;
+  type: DiagramEntityType,
 }
 
 export type DiagramEntityPointer = number;

@@ -13,9 +13,7 @@ export function sequenceDiagramToPuml(
 
   // declare participants in order
   for (const participant of diagram.entities(DiagramEntityType.Participant)) {
-    const { subType } = participant.meta;
-    const participantType = subType || "participant";
-    const participantSource = `${participantType} "${participant.name}"`;
+    const participantSource = `${participant.subType} "${participant.name}"`;
     sourceStringFragments.push(participantSource);
   }
 
@@ -24,8 +22,7 @@ export function sequenceDiagramToPuml(
 
   // declare messages in order
   for (const message of diagram.entities(DiagramEntityType.Message)) {
-    const { from, to, label, dotted } = message.meta;
-    const msgSource = `${from} ${dotted ? "-->" : "->"} ${to} : ${label}`;
+    const msgSource = `${message.from} ${message.dotted ? "-->" : "->"} ${message.to} : ${message.label}`;
     sourceStringFragments.push(msgSource);
   }
 

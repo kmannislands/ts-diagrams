@@ -12,5 +12,8 @@ node_modules/
 # Built artifacts
 dist
 
+# ts cache
+tsconfig.tsbuildinfo
+
 # test coverage artifacts
 coverage/

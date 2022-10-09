@@ -2,6 +2,12 @@ import { describe, expect, it } from "@jest/globals";
 import { renderDiagramToPlantUML } from "./frontend-plantuml";
 import { SequenceDiagram } from "./sequence-diagram";
 
+
+/**
+ * Based off a subset of PUML features from sequence diagram example.
+ *
+ * @see https://plantuml.com/sequence-diagram
+ */
 describe("Sequence Diagram integration with PlantUML frontend", () => {
   it("matches expectated rendered source code for the simplest example", () => {
     const classicExample = new SequenceDiagram()
