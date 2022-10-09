@@ -8,3 +8,6 @@
 
 # Built artifacts
 dist
+
+# test coverage artifacts
+coverage/

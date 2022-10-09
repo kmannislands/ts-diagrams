@@ -15,3 +15,15 @@ export function assertUnreachable(unreachableValue: never): never {
  * different types that are assignable to string based on some other semantic value.
  */
 export type BrandedStr<Brand extends string> = string & { __brand: Brand };
+
+declare global {
+  interface ObjectConstructor {
+    /**
+     * Returns an object created by key-value entries for properties and methods
+     * @param entries An iterable object that contains key-value entries for properties and methods.
+     */
+    fromEntries<ValueType = any, KeyType extends string = string>(
+      entries: Iterable<readonly [KeyType, ValueType]>
+    ): { [k in KeyType]: ValueType };
+  }
+}
