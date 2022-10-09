@@ -8,21 +8,29 @@ export function sequenceDiagramToPuml(
   diagram: SequenceDiagram,
   title?: string
 ): PlantUMLSource {
-  const titleFragment = `@startuml ${title}`;
+  const titleFragment = `@startuml ${title || ""}`;
   const sourceStringFragments: string[] = [];
 
   // declare participants in order
   for (const participant of diagram.entities(DiagramEntityType.Participant)) {
-    const participantSource = `participant "${participant.name}"`;
+    const { subType } = participant.meta;
+    const participantType = subType || "participant";
+    const participantSource = `${participantType} "${participant.name}"`;
     sourceStringFragments.push(participantSource);
   }
 
+  // Add a line break between groups
+  sourceStringFragments.push('');
+
   // declare messages in order
   for (const message of diagram.entities(DiagramEntityType.Message)) {
-    const { from, to, label } = message.meta;
-    const msgSource = `${from} -> ${to} : ${label}`;
+    const { from, to, label, dotted } = message.meta;
+    const msgSource = `${from} ${dotted ? "-->" : "->"} ${to} : ${label}`;
     sourceStringFragments.push(msgSource);
   }
+
+  // Add a line break between groups
+  sourceStringFragments.push('');
 
   const closeUmlFragment = "@enduml";
 

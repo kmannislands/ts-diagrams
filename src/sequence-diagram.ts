@@ -18,6 +18,10 @@ type BaseParticipantNames = string | Empty;
 
 export const SequenceDiagramType = "Sequence" as const;
 
+enum ParticipantType {
+  Actor = 'actor',
+}
+
 function getInitialIndex(): DiagramEntityIndex {
   const entityTypes = Object.values(DiagramEntityType);
   return Object.fromEntries(entityTypes.map((entityType) => [entityType, {}]));
@@ -39,6 +43,9 @@ export class SequenceDiagram<
     const newActorEntity: DiagramEntity = {
       type: DiagramEntityType.Participant,
       name: actorName,
+      meta: {
+        subType: ParticipantType.Actor,
+      }
     };
 
     return new SequenceDiagram([...this.diagramEntities, newActorEntity]);

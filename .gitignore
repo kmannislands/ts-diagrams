@@ -6,6 +6,9 @@
 !.yarn/sdks
 !.yarn/versions
 
+# we use pnp but some tools (jest esbuild) keep a cache here by default
+node_modules/
+
 # Built artifacts
 dist
 
