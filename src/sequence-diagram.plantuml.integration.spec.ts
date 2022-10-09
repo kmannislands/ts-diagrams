@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
 import { renderDiagramToPlantUML } from "./frontend-plantuml";
 import { SequenceDiagram } from "./sequence-diagram";
-
+import { Participant, ParticipantType } from "./sequence-diagram/participant";
 
 /**
  * Based off a subset of PUML features from sequence diagram example.
@@ -50,8 +50,12 @@ Bob --> Alice : Authentication Response
       .addMessage({ from: "Participant", to: "Control", label: "To control" })
       .addMessage({ from: "Participant", to: "Entity", label: "To entity" })
       .addMessage({ from: "Participant", to: "Database", label: "To database" })
-      .addMessage({ from: "Participant", to: "Collections", label: "To collections" })
-      .addMessage({ from: "Participant", to: "Queue", label: "To queue" })
+      .addMessage({
+        from: "Participant",
+        to: "Collections",
+        label: "To collections",
+      })
+      .addMessage({ from: "Participant", to: "Queue", label: "To queue" });
 
     const renderedSource = renderDiagramToPlantUML(allParticipants);
 
@@ -73,6 +77,30 @@ Participant -> Entity : To entity
 Participant -> Database : To database
 Participant -> Collections : To collections
 Participant -> Queue : To queue
+
+@enduml"
+`);
+  });
+
+  it("works with design for alias", () => {
+    const longNameParticipant = new Participant(
+      "I have a very long name",
+      ParticipantType.Database
+    );
+
+    const longNameExample = new SequenceDiagram()
+      .addParticipantInstance(longNameParticipant)
+      .addMessage({
+        from: longNameParticipant,
+        to: longNameParticipant,
+        label: 'Self-call'
+      });
+
+    expect(renderDiagramToPlantUML(longNameExample)).toMatchInlineSnapshot(`
+"@startuml 
+database "I have a very long name" as database1
+
+database1 -> database1 : Self-call
 
 @enduml"
 `);
