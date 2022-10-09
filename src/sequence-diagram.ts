@@ -1,4 +1,8 @@
-import { DiagramEntity, DiagramEntityIndex, DiagramEntityType } from "./diagram";
+import {
+  DiagramEntity,
+  DiagramEntityIndex,
+  DiagramEntityType,
+} from "./diagram";
 
 interface SequenceMessage<ParticipantName extends BaseParticipantNames> {
   from: ParticipantName;
@@ -19,7 +23,14 @@ type BaseParticipantNames = string | Empty;
 export const SequenceDiagramType = "Sequence" as const;
 
 enum ParticipantType {
-  Actor = 'actor',
+  Participant = "participant",
+  Actor = "actor",
+  Boundary = "boundary",
+  Control = "control",
+  Entity = "entity",
+  Database = "database",
+  Collections = "collections",
+  Queue = "queue",
 }
 
 function getInitialIndex(): DiagramEntityIndex {
@@ -37,18 +48,25 @@ export class SequenceDiagram<
 
   constructor(private diagramEntities: DiagramEntity[] = []) {}
 
-  public addActor<ActorName extends string>(
-    actorName: ActorName
-  ): SequenceDiagram<DiagramParticipantNames | ActorName> {
+  public addParticipant<ParticipantName extends string>(
+    participantName: ParticipantName,
+    type?: ParticipantType | `${ParticipantType}`
+  ): SequenceDiagram<DiagramParticipantNames | ParticipantName> {
     const newActorEntity: DiagramEntity = {
       type: DiagramEntityType.Participant,
-      name: actorName,
+      name: participantName,
       meta: {
-        subType: ParticipantType.Actor,
-      }
+        subType: type || ParticipantType.Participant,
+      },
     };
 
     return new SequenceDiagram([...this.diagramEntities, newActorEntity]);
+  }
+
+  public addActor<ActorName extends string>(
+    actorName: ActorName
+  ): SequenceDiagram<DiagramParticipantNames | ActorName> {
+    return this.addParticipant(actorName, ParticipantType.Actor);
   }
 
   public addMessage(

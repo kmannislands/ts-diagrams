@@ -29,7 +29,6 @@ export function sequenceDiagramToPuml(
     sourceStringFragments.push(msgSource);
   }
 
-  // Add a line break between groups
   sourceStringFragments.push('');
 
   const closeUmlFragment = "@enduml";
