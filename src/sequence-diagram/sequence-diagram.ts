@@ -100,22 +100,24 @@ export class SequenceDiagram<
     return boxedDiagramParticipants.withEntity<ParticipantNamesAfter>(box);
   }
 
-  entities(): Generator<
-    SequenceDiagramEntity<Exclude<DiagramParticipantNames, Empty>>
-  >;
-  entities<EntityType extends DiagramEntityType>(
-    entityType: EntityType
-  ): Generator<SequenceDiagramEntityMap[EntityType]>;
+  // entities(): Generator<
+  //   SequenceDiagramEntity<Exclude<DiagramParticipantNames, Empty>>
+  // >;
+  entities<EntityTypes extends DiagramEntityType[]>(
+    ...entityTypes: EntityTypes
+  ): Generator<SequenceDiagramEntityMap[EntityTypes[number]]>;
   public *entities(
-    entityType?: DiagramEntityType
+    ...entityTypes: DiagramEntityType[]
   ): Generator<
     SequenceDiagramEntity<DefinedParticipantNames<DiagramParticipantNames>>
   > {
+    const narrowEntities = entityTypes.length > 0;
     // TODO could iterate over a smaller list with a cached index. Heuristic based on expected usage pattern:
     // if one entity type is read on an instance, others are likely to. However, most instances are
     // unlikely to be read (since they're transient instances used in chaining).
     for (const entity of this.diagramEntities) {
-      if (entityType && entity.type !== entityType) {
+      const isRequestedEntity = entityTypes.includes(entity.type);
+      if (narrowEntities && !isRequestedEntity) {
         continue;
       }
       yield entity;

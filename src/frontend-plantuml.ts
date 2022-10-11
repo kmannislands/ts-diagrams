@@ -60,7 +60,8 @@ export function sequenceDiagramToPuml(
   const sourceStringFragments: PlantUMLFragment[] = [];
 
   // declare participants in order
-  for (const participant of diagram.entities(DiagramEntityType.Participant)) {
+  for (const participant of diagram.entities(DiagramEntityType.Box, DiagramEntityType.Participant)) {
+    console.log('iter over participant', participant);
     const participantPuml = renderParticipant(participantAliases, participant);
     sourceStringFragments.push(participantPuml);
   }

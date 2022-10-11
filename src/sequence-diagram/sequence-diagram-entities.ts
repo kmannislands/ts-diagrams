@@ -13,5 +13,7 @@ export type SequenceDiagramEntityMap = {
     ? Participant<string>
     : k extends DiagramEntityType.Message
     ? SequenceMessage<string>
+    : k extends DiagramEntityType.Box
+    ? Box<string>
     : never;
 };
