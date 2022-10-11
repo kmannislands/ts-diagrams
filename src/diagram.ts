@@ -6,6 +6,7 @@ export type Diagram = SequenceDiagram<string>;
 export enum DiagramEntityType {
   Participant = "participant",
   Message = "message",
+  Box = "box",
 }
 
 export interface DiagramEntity {

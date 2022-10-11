@@ -93,7 +93,7 @@ Participant -> Queue : To queue
       .addMessage({
         from: longNameParticipant,
         to: longNameParticipant,
-        label: 'Self-call'
+        label: "Self-call",
       });
 
     expect(renderDiagramToPlantUML(longNameExample)).toMatchInlineSnapshot(`
@@ -101,6 +101,32 @@ Participant -> Queue : To queue
 database "I have a very long name" as database1
 
 database1 -> database1 : Self-call
+
+@enduml"
+`);
+  });
+
+  it("works with box", () => {
+    const diag = new SequenceDiagram()
+      .box("VPN", (d) =>
+        d
+          .addActor("Internal user")
+          .addParticipant("Internal DB", ParticipantType.Database)
+      )
+      .addMessage({
+        from: "Internal user",
+        to: "Internal DB",
+        label: "Insert rows",
+      });
+
+    expect(renderDiagramToPlantUML(diag)).toMatchInlineSnapshot(`
+"@startuml 
+box vpn
+  actor "Internal user" as actor1
+  database "Internal DB" as database1
+end box
+
+Internal user -> Internal DB : Insert rows
 
 @enduml"
 `);

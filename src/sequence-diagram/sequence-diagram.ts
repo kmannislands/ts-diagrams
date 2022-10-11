@@ -1,10 +1,10 @@
-import {
-  DiagramEntity,
-  // DiagramEntityIndex,
-  DiagramEntityType,
-} from "../diagram";
+import { DiagramEntityType } from "../diagram";
+import { Box } from "./box";
 import { Participant, ParticipantType } from "./participant";
-import { SequenceDiagramEntity, SequenceDiagramEntityMap } from "./sequence-diagram-entities";
+import {
+  SequenceDiagramEntity,
+  SequenceDiagramEntityMap,
+} from "./sequence-diagram-entities";
 import { SequenceMessage, SequenceMessageConfig } from "./sequence-message";
 
 // Special empty token that *should not be exported from the library* used to satisfy initial conditions for
@@ -23,7 +23,8 @@ export const SequenceDiagramType = "Sequence" as const;
 //   return Object.fromEntries(entityTypes.map((entityType) => [entityType, {}]));
 // }
 
-type DefinedParticipantNames<ExistingNames extends BaseParticipantNames> = Exclude<ExistingNames, Empty>;
+type DefinedParticipantNames<ExistingNames extends BaseParticipantNames> =
+  Exclude<ExistingNames, Empty>;
 
 type NewSeqDiag<
   ExistingNames extends BaseParticipantNames,
@@ -44,12 +45,20 @@ export class SequenceDiagram<
     >[] = []
   ) {}
 
+  private withEntity<NewParticipantName extends string>(
+    newEntity: SequenceDiagramEntity<NewParticipantName>
+  ): NewSeqDiag<DiagramParticipantNames, NewParticipantName> {
+    // TODO figure out index typing
+    return new SequenceDiagram<
+      DefinedParticipantNames<DiagramParticipantNames> | NewParticipantName
+    >([...this.entities(), newEntity] as any);
+  }
+
   public addParticipantInstance<ParticipantName extends string>(
     participant: Participant<ParticipantName>
   ): NewSeqDiag<DiagramParticipantNames, ParticipantName> {
-    const newEntities = [...this.diagramEntities, participant];
     // TODO: figure out typing here... trouble with excluding Empty?
-    return new SequenceDiagram(newEntities as any);
+    return this.withEntity(participant);
   }
 
   public addParticipant<NewParticipantName extends string>(
@@ -75,12 +84,33 @@ export class SequenceDiagram<
     msg: SequenceMessageConfig<Exclude<DiagramParticipantNames, Empty>>
   ): SequenceDiagram<DiagramParticipantNames> {
     const messageInstance = new SequenceMessage(msg);
-    return new SequenceDiagram([...this.diagramEntities, messageInstance]);
+    return this.withEntity(messageInstance);
   }
 
-  entities(): Generator<DiagramEntity>
-  entities<EntityType extends DiagramEntityType>(entityType: EntityType): Generator<SequenceDiagramEntityMap[EntityType]>
-  public *entities(entityType?: DiagramEntityType): Generator<DiagramEntity> {
+  public box<ParticipantNamesAfter extends string>(
+    boxTitle: string,
+    boxCb: (
+      existingDiagram: SequenceDiagram<DiagramParticipantNames>
+    ) => SequenceDiagram<ParticipantNamesAfter>
+  ): NewSeqDiag<DiagramParticipantNames, ParticipantNamesAfter> {
+    const boxedDiagramParticipants = boxCb(this);
+
+    const box = new Box(boxTitle);
+
+    return boxedDiagramParticipants.withEntity<ParticipantNamesAfter>(box);
+  }
+
+  entities(): Generator<
+    SequenceDiagramEntity<Exclude<DiagramParticipantNames, Empty>>
+  >;
+  entities<EntityType extends DiagramEntityType>(
+    entityType: EntityType
+  ): Generator<SequenceDiagramEntityMap[EntityType]>;
+  public *entities(
+    entityType?: DiagramEntityType
+  ): Generator<
+    SequenceDiagramEntity<DefinedParticipantNames<DiagramParticipantNames>>
+  > {
     // TODO could iterate over a smaller list with a cached index. Heuristic based on expected usage pattern:
     // if one entity type is read on an instance, others are likely to. However, most instances are
     // unlikely to be read (since they're transient instances used in chaining).
