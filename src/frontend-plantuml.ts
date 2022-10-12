@@ -1,7 +1,8 @@
-import { Diagram, DiagramEntityType } from "./diagram";
-import { SequenceDiagram, SequenceDiagramType } from "./sequence-diagram";
+import { Diagram } from "./diagram";
+import { SequenceDiagram } from "./sequence-diagram";
 import { Box } from "./sequence-diagram/box";
 import { Participant } from "./sequence-diagram/participant";
+import { SeqDiagramEntityType } from "./sequence-diagram/sequence-diagram-entities";
 import { SequenceMessage } from "./sequence-diagram/sequence-message";
 import { assertUnreachable, BrandedStr } from "./type-util";
 
@@ -69,21 +70,22 @@ function* renderBoxFragments(
 }
 
 function* renderParticipants(
-  diagram: SequenceDiagram,
+  diagram: SequenceDiagram<string>,
   participantAliases: ParticipantAliasDict
 ): Generator<PlantUMLFragment> {
   // declare participants in order
+  // TODO overload isn't working...
   for (const entity of diagram.entities(
-    DiagramEntityType.Box,
-    DiagramEntityType.Participant
+    SeqDiagramEntityType.Box,
+    SeqDiagramEntityType.Participant
   )) {
     switch (entity.type) {
-      case DiagramEntityType.Participant:
+      case SeqDiagramEntityType.Participant:
         yield renderParticipant(participantAliases, entity);
         break;
-      case DiagramEntityType.Box:
+      case SeqDiagramEntityType.Box:
         // Make box extend IParticipantContainer?
-        yield* renderBoxFragments(entity);
+        yield* renderBoxFragments(entity, participantAliases);
         break;
       default:
         assertUnreachable(entity);
@@ -92,7 +94,7 @@ function* renderParticipants(
 }
 
 function* sequenceDiagramChunks(
-  diagram: SequenceDiagram
+  diagram: SequenceDiagram<string>
 ): Generator<PlantUMLFragment> {
   // There's really no need to parallelize this but this is the shared memory that would need special attention:
   const participantAliases: ParticipantAliasDict = new Map();
@@ -103,7 +105,7 @@ function* sequenceDiagramChunks(
   yield "" as PlantUMLFragment;
 
   // declare messages in order
-  for (const message of diagram.entities(DiagramEntityType.Message)) {
+  for (const message of diagram.entities(SeqDiagramEntityType.Message)) {
     yield renderMessage(participantAliases, message);
   }
 
@@ -135,7 +137,7 @@ function makePlantUmlSource(
 }
 
 export function sequenceDiagramToPuml(
-  diagram: SequenceDiagram,
+  diagram: SequenceDiagram<string>,
   title?: string
 ): PlantUMLSource {
   const sourceStringFragments = accumulateGenerator(
@@ -154,11 +156,5 @@ export function renderDiagramToPlantUML(
   diagram: Diagram,
   title?: string
 ): PlantUMLSource {
-  switch (diagram.diagramType) {
-    case SequenceDiagramType:
-      // TODO fix union discrimination... enum?
-      return sequenceDiagramToPuml(diagram, title);
-    default:
-      assertUnreachable(diagram.diagramType);
-  }
+  return sequenceDiagramToPuml(diagram, title);
 }

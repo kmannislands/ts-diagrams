@@ -1,21 +1,21 @@
-import { SequenceDiagram } from "./sequence-diagram";
+import type { SequenceDiagram } from "./sequence-diagram";
 
-// Add to union with new types:
+// Special empty token that *should not be exported from the library* used to satisfy initial conditions for
+// str lit union types
+export const EMPTY = Symbol("EMPTY");
+export type Empty = typeof EMPTY;
+
+// Add new diagram types to the union as they're created:
 export type Diagram = SequenceDiagram<string>;
 
-export enum DiagramEntityType {
-  Participant = "participant",
-  Message = "message",
-  Box = "box",
+export interface IDiagramEntity<EntityType extends string> {
+  type: EntityType;
 }
 
-export interface DiagramEntity {
-  type: DiagramEntityType,
+export enum DiagramType {
+  SequenceDiagram = 'sequence'
 }
 
-export type DiagramEntityPointer = number;
-
-export type DiagramEntityIndex = Record<
-  DiagramEntityType,
-  Record<string, DiagramEntityPointer>
->;
+export interface IDiagram<Type extends DiagramType> {
+  diagramType: Type;
+}

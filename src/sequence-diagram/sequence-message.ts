@@ -1,5 +1,6 @@
-import { DiagramEntity, DiagramEntityType } from "../diagram";
+import { IDiagramEntity } from "../diagram";
 import { Participant } from "./participant";
+import { SeqDiagramEntityType } from "./sequence-diagram-entities";
 
 export interface SequenceMessageConfig<ParticipantName extends string> {
   from: ParticipantName | Participant<ParticipantName>;
@@ -11,9 +12,13 @@ export interface SequenceMessageConfig<ParticipantName extends string> {
 }
 
 export class SequenceMessage<ParticipantName extends string>
-  implements SequenceMessageConfig<ParticipantName>, DiagramEntity
+  implements
+    SequenceMessageConfig<ParticipantName>,
+    IDiagramEntity<SeqDiagramEntityType.Message>
 {
-  public readonly type = DiagramEntityType.Message;
+  __name!: ParticipantName;
+
+  public readonly type = SeqDiagramEntityType.Message;
 
   constructor(
     private readonly message: SequenceMessageConfig<ParticipantName>

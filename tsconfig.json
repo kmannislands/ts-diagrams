@@ -37,7 +37,7 @@
       // "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */,
   
       "lib": ["es2020"],
-      "typeRoots": ["node_modules/@types"]
+      "typeRoots": ["node_modules/@types", "node_modules/@jest/globals"]
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules/**"],

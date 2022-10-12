@@ -1,4 +1,5 @@
-import { DiagramEntity, DiagramEntityType } from "../diagram";
+import { IDiagramEntity } from "../diagram";
+import { SeqDiagramEntityType } from "./sequence-diagram-entities";
 
 export enum ParticipantType {
   Participant = "participant",
@@ -11,8 +12,10 @@ export enum ParticipantType {
   Queue = "queue",
 }
 
-export class Participant<ParticipantName extends string> implements DiagramEntity {
-  public readonly type = DiagramEntityType.Participant;
+export class Participant<ParticipantName extends string>
+  implements IDiagramEntity<SeqDiagramEntityType.Participant>
+{
+  public readonly type = SeqDiagramEntityType.Participant;
 
   constructor(
     public readonly name: ParticipantName,
