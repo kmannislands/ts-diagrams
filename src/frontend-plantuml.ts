@@ -1,5 +1,6 @@
 import { Diagram, DiagramEntityType } from "./diagram";
 import { SequenceDiagram, SequenceDiagramType } from "./sequence-diagram";
+import { Box } from "./sequence-diagram/box";
 import { Participant } from "./sequence-diagram/participant";
 import { SequenceMessage } from "./sequence-diagram/sequence-message";
 import { assertUnreachable, BrandedStr } from "./type-util";
@@ -7,9 +8,16 @@ import { assertUnreachable, BrandedStr } from "./type-util";
 type PlantUMLSource = BrandedStr<"PlantUMLSource">;
 type PlantUMLFragment = BrandedStr<"PlantUMLFragment">;
 
+type ParticipantAliasDict = Map<Participant<string>, string>;
+
+function pumlFrag(frag: string): PlantUMLFragment {
+  return frag as PlantUMLFragment;
+}
+
 function renderParticipant(
-  participantAliases: Map<Participant<string>, string>,
-  participant: Participant<string>
+  participantAliases: ParticipantAliasDict,
+  participant: Participant<string>,
+  indent: number = 0
 ): PlantUMLFragment {
   // TODO check for other illegal characters
   const needsAlias = participant.name.indexOf(" ") > 0;
@@ -26,11 +34,11 @@ function renderParticipant(
     alias && ` as ${alias}`
   }`;
 
-  return participantSource as PlantUMLFragment;
+  return pumlFrag(participantSource.padStart(indent));
 }
 
 function renderMessage(
-  participantAliases: Map<Participant<string>, string>,
+  participantAliases: ParticipantAliasDict,
   message: SequenceMessage<string>
 ): PlantUMLFragment {
   // Resolve any aliases
@@ -48,49 +56,107 @@ function renderMessage(
     message.dotted ? "-->" : "->"
   } ${toParticipantName} : ${message.label}`;
 
-  return msgSource as PlantUMLFragment;
+  return pumlFrag(msgSource);
+}
+
+function* renderBoxFragments(
+  box: Box<string>,
+  participantAliases: ParticipantAliasDict
+): Generator<PlantUMLFragment> {
+  yield pumlFrag(`box ${box.boxName}`);
+  yield* renderParticipants(box, participantAliases);
+  yield pumlFrag(`end box`);
+}
+
+function* renderParticipants(
+  diagram: SequenceDiagram,
+  participantAliases: ParticipantAliasDict
+): Generator<PlantUMLFragment> {
+  // declare participants in order
+  for (const entity of diagram.entities(
+    DiagramEntityType.Box,
+    DiagramEntityType.Participant
+  )) {
+    switch (entity.type) {
+      case DiagramEntityType.Participant:
+        yield renderParticipant(participantAliases, entity);
+        break;
+      case DiagramEntityType.Box:
+        // Make box extend IParticipantContainer?
+        yield* renderBoxFragments(entity);
+        break;
+      default:
+        assertUnreachable(entity);
+    }
+  }
+}
+
+function* sequenceDiagramChunks(
+  diagram: SequenceDiagram
+): Generator<PlantUMLFragment> {
+  // There's really no need to parallelize this but this is the shared memory that would need special attention:
+  const participantAliases: ParticipantAliasDict = new Map();
+
+  yield* renderParticipants(diagram, participantAliases);
+
+  // Add line break between sections
+  yield "" as PlantUMLFragment;
+
+  // declare messages in order
+  for (const message of diagram.entities(DiagramEntityType.Message)) {
+    yield renderMessage(participantAliases, message);
+  }
+
+  yield "" as PlantUMLFragment;
+}
+
+function accumulateGenerator<YieldValue>(
+  generator: Generator<YieldValue>
+): YieldValue[] {
+  const acc: YieldValue[] = [];
+
+  for (const value of generator) {
+    acc.push(value);
+  }
+
+  return acc;
+}
+
+function makePlantUmlSource(
+  lines: PlantUMLFragment[],
+  title?: string
+): PlantUMLSource {
+  const titleFragment = `@startuml ${title || ""}`;
+  const closeUmlFragment = "@enduml";
+
+  return [titleFragment, ...lines, closeUmlFragment].join(
+    "\n"
+  ) as PlantUMLSource;
 }
 
 export function sequenceDiagramToPuml(
   diagram: SequenceDiagram,
   title?: string
 ): PlantUMLSource {
-  const titleFragment = `@startuml ${title || ""}`;
-  const participantAliases = new Map<Participant<string>, string>();
-  const sourceStringFragments: PlantUMLFragment[] = [];
+  const sourceStringFragments = accumulateGenerator(
+    sequenceDiagramChunks(diagram)
+  );
 
-  // declare participants in order
-  for (const participant of diagram.entities(DiagramEntityType.Box, DiagramEntityType.Participant)) {
-    console.log('iter over participant', participant);
-    const participantPuml = renderParticipant(participantAliases, participant);
-    sourceStringFragments.push(participantPuml);
-  }
-
-  // Add a line break between groups
-  sourceStringFragments.push("" as PlantUMLFragment);
-
-  // declare messages in order
-  for (const message of diagram.entities(DiagramEntityType.Message)) {
-    const msgSource = renderMessage(participantAliases, message);
-    sourceStringFragments.push(msgSource);
-  }
-
-  sourceStringFragments.push("" as PlantUMLFragment);
-
-  const closeUmlFragment = "@enduml";
-
-  // open/close @startUml
-  return [titleFragment, ...sourceStringFragments, closeUmlFragment].join(
-    "\n"
-  ) as PlantUMLSource;
+  return makePlantUmlSource(sourceStringFragments, title);
 }
 
+/**
+ * @nb this is currently implemented as a recursive renderer and would bomb out with some level of
+ * nesting. However, it's safe to assume there are larger problems if you have > max stack frame limit level
+ * of nesting in your diagram (you ok bro?).
+ */
 export function renderDiagramToPlantUML(
   diagram: Diagram,
   title?: string
 ): PlantUMLSource {
   switch (diagram.diagramType) {
     case SequenceDiagramType:
+      // TODO fix union discrimination... enum?
       return sequenceDiagramToPuml(diagram, title);
     default:
       assertUnreachable(diagram.diagramType);
