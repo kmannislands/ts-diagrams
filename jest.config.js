@@ -3,7 +3,7 @@
  * https://jestjs.io/docs/configuration
  */
 
-export default {
+module.exports = {
   // Indicates whether the coverage information should be collected while executing the test
   collectCoverage: true,
 
