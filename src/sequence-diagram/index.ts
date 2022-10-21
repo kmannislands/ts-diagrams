@@ -1,1 +1,1 @@
-export * from "./sequence-diagram";
+export * from './sequence-diagram';

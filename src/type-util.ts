@@ -7,7 +7,7 @@
  * @todo Pass error message template in generically?
  */
 export function assertUnreachable(unreachableValue: never): never {
-  throw new Error(`Unreachable: diagram type ${String(unreachableValue)}`);
+    throw new Error(`Unreachable: diagram type ${String(unreachableValue)}`);
 }
 
 /**
@@ -17,13 +17,13 @@ export function assertUnreachable(unreachableValue: never): never {
 export type BrandedStr<Brand extends string> = string & { __brand: Brand };
 
 declare global {
-  interface ObjectConstructor {
-    /**
-     * Returns an object created by key-value entries for properties and methods
-     * @param entries An iterable object that contains key-value entries for properties and methods.
-     */
-    fromEntries<ValueType = any, KeyType extends string = string>(
-      entries: Iterable<readonly [KeyType, ValueType]>
-    ): { [k in KeyType]: ValueType };
-  }
+    interface ObjectConstructor {
+        /**
+         * Returns an object created by key-value entries for properties and methods
+         * @param entries An iterable object that contains key-value entries for properties and methods.
+         */
+        fromEntries<ValueType = any, KeyType extends string = string>(
+            entries: Iterable<readonly [KeyType, ValueType]>
+        ): { [k in KeyType]: ValueType };
+    }
 }

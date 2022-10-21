@@ -1,20 +1,20 @@
-import { IDiagramEntity } from "../diagram";
+import { IDiagramEntity } from '../diagram';
 // import { EntityContainer } from "../entity-container";
-import { IParticipantContainer } from "./IParticipantContainer";
-import { SeqDiagramEntityType } from "./sequence-diagram-entities";
+import { IParticipantContainer } from './IParticipantContainer';
+import { SeqDiagramEntityType } from './sequence-diagram-entities';
 
-export const BoxType = "box";
+export const BoxType = 'box';
 
 export class Box<ParticipantName extends string>
-  implements
-    IDiagramEntity<SeqDiagramEntityType.Box>,
-    IParticipantContainer<ParticipantName>
+    implements
+        IDiagramEntity<SeqDiagramEntityType.Box>,
+        IParticipantContainer<ParticipantName>
 {
-  public readonly type = SeqDiagramEntityType.Box;
+    public readonly type = SeqDiagramEntityType.Box;
 
-  // private container = new EntityContainer();
+    // private container = new EntityContainer();
 
-  constructor(public readonly boxName: string) {}
+    constructor(public readonly boxName: string) {}
 
-  // public entities = this.container.entities;
+    // public entities = this.container.entities;
 }
