@@ -11,7 +11,7 @@ type BaseEntityTypeMap<
 
 interface IEntityContainer<
   EntityType extends string,
-  Entity extends IDiagramEntity<EntityType>,
+  Entity extends IDiagramEntity<EntityType>
 > {
   /**
    * Iterate over entities that this participant container contains

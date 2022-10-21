@@ -1,0 +1,7 @@
+{
+    // Specified in .editorconfig, should be inherited by prettier
+    // "printWidth": 100,
+    // "tabWidth": 4,
+    "quotes": true,
+    "trailingComma": "es5"
+}

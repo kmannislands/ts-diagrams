@@ -13,7 +13,7 @@ export interface IDiagramEntity<EntityType extends string> {
 }
 
 export enum DiagramType {
-  SequenceDiagram = 'sequence'
+  SequenceDiagram = "sequence",
 }
 
 export interface IDiagram<Type extends DiagramType> {
